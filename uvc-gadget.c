@@ -589,7 +589,7 @@ static int v4l2_reqbufs_mmap(struct v4l2_device * dev, struct v4l2_requestbuffer
         }
 
         dev->mem[i].length = dev->mem[i].buf.length;
-        printf("%s: Buffer %u mapped at address %p, length %d.\n",
+        printf("%s: Buffer %u mapped at address %p, length %zd.\n",
             dev->device_type_name, i, dev->mem[i].start, dev->mem[i].length);
     }
 
@@ -910,6 +910,16 @@ static void v4l2_set_ctrl(struct control_mapping_pair ctrl)
 
     v4l2_ctrl_value = (ctrl.value - ctrl.minimum) * v4l2_diff / ctrl_diff + ctrl.v4l2_minimum;
 
+    // The UVC exposure mode values do not directly map to the ELP camera V4L2 values. See v4l2_apply_camera_control
+    if (ctrl.v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+        if (ctrl.value == 1 || ctrl.value == 4) {
+            v4l2_ctrl_value = 1; // Manual Mode
+        }
+        if (ctrl.value == 2 || ctrl.value == 8) {
+            v4l2_ctrl_value = 3; // Auto Mode
+        }
+    }
+
     v4l2_set_ctrl_value(ctrl, ctrl.v4l2, v4l2_ctrl_value);
 
     if (ctrl.v4l2 == V4L2_CID_RED_BALANCE) {
@@ -933,7 +943,24 @@ static void v4l2_apply_camera_control(struct control_mapping_pair * mapping,
     mapping->step          = queryctrl.step;
     mapping->default_value = (0 - queryctrl.minimum) + queryctrl.default_value;
     mapping->value         = (0 - queryctrl.minimum) + control.value;
-    
+
+    // UVC_CT_AE_MODE_CONTROL is a bitmap. See 4.2.2.1.2 in the UVC 1.5 Class Specification
+    // 1: D0: Manual Mode – manual Exposure Time, manual Iris
+    // 2: D1: Auto Mode – auto Exposure Time, auto Iris
+    // 4: D2: Shutter Priority Mode – manual Exposure Time, auto Iris
+    // 8: D3: Aperture Priority Mode – auto Exposure Time, manual Iris
+    // Windows behaves different from Linux. Windows will use D2 for manual and Linux D0 for manual
+    // The ELP camera uses the following values:
+    //      1: Manual Mode
+    //      3: Aperture Priority Mode
+    if (mapping->v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+        mapping->minimum = 1;
+        mapping->maximum = 8;
+        mapping->step = 0xF;
+        mapping->default_value = 2; // set auto-mode as default
+        mapping->value = mapping->default_value;
+    }
+
     printf("V4L2: Supported control %s (%s = %s)\n", queryctrl.name,
         mapping->v4l2_name, mapping->uvc_name);
 
@@ -948,7 +975,7 @@ static void v4l2_apply_camera_control(struct control_mapping_pair * mapping,
     printf("V4L2:   UVC: min: %d, max: %d, step: %d, default: %d, value: %d\n",
         mapping->minimum,
         mapping->maximum,
-        queryctrl.step,
+        mapping->step,
         mapping->default_value,
         mapping->value
     );
@@ -1519,6 +1546,16 @@ static void uvc_interface_control(unsigned int interface,
         break;
 
     case UVC_GET_CUR:
+        // The UVC exposure mode values do not directly map to the ELP camera V4L2 values. See v4l2_apply_camera_control
+        if (control_mapping[i].v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+            if (control_mapping[i].value == 1) {
+                control_mapping[i].value = 1; // Manual Mode
+            }
+            if (control_mapping[i].value == 3) {
+                control_mapping[i].value = 2; // Auto Mode
+            }
+        }
+
         resp->length = 4;
         memcpy(&resp->data[0], &control_mapping[i].value, resp->length);
         uvc_dev.request_error_code = REQEC_NO_ERROR;
@@ -1541,6 +1578,10 @@ static void uvc_interface_control(unsigned int interface,
         memcpy(&resp->data[0], &control_mapping[i].step, resp->length);
         uvc_dev.request_error_code = REQEC_NO_ERROR;
         break;
+
+    case UVC_GET_LEN:
+        printf("Warning: Handling of UVC_GET_LEN is not implemented\n");
+        fallthrough;
 
     default:
         resp->length = -EL2HLT;

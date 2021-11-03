@@ -31,6 +31,12 @@
 #define ARRAY_SIZE(a) ((sizeof(a) / sizeof(a[0])))
 #define pixfmtstr(x) (x) & 0xff, ((x) >> 8) & 0xff, ((x) >> 16) & 0xff, ((x) >> 24) & 0xff
 
+#if __has_attribute(__fallthrough__)
+# define fallthrough                    __attribute__((__fallthrough__))
+#else
+# define fallthrough                    do {} while (0)  /* fallthrough */
+#endif
+
 enum gpio {
     GPIO_EXPORT = 0,
     GPIO_DIRECTION,
