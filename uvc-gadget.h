@@ -332,8 +332,8 @@ struct control_mapping_pair control_mapping[] = {
         .type = UVC_VC_PROCESSING_UNIT,
 		.uvc = UVC_PU_WHITE_BALANCE_TEMPERATURE_CONTROL,
 		.uvc_name = "UVC_PU_WHITE_BALANCE_TEMPERATURE_CONTROL",
-        .v4l2 = V4L2_CID_WHITE_BALANCE_TEMPERATURE,
-        .v4l2_name = "V4L2_CID_WHITE_BALANCE_TEMPERATURE",
+        .v4l2 = V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE,
+        .v4l2_name = "V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE",
 	},
 	{
         .type = UVC_VC_PROCESSING_UNIT,
