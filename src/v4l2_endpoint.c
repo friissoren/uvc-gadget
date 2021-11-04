@@ -73,6 +73,16 @@ void v4l2_set_ctrl(struct processing *processing)
         ctrl->value = clamp(ctrl->value, ctrl->minimum, ctrl->maximum);
         v4l2_ctrl_value = (ctrl->value - ctrl->minimum) * v4l2_diff / ctrl_diff + ctrl->v4l2_minimum;
 
+        // The UVC exposure mode values do not directly map to the RaspberryPi V4L2 values. See v4l2_prepare_camera_control
+        if (ctrl->v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+            if (ctrl->value == 1 || ctrl->value == 4) {
+                v4l2_ctrl_value = 1; // Manual Mode
+            }
+            if (ctrl->value == 2) {
+                v4l2_ctrl_value = 0; // Auto Mode
+            }
+        }
+
         v4l2_set_ctrl_value(processing, ctrl, ctrl->v4l2, v4l2_ctrl_value);
 
         if (ctrl->v4l2 == V4L2_CID_RED_BALANCE)
@@ -106,6 +116,17 @@ static void v4l2_prepare_camera_control(struct processing *processing,
         .v4l2_minimum = queryctrl.minimum,
         .value = (0 - queryctrl.minimum) + value,
     };
+
+    // UVC_CT_AE_MODE_CONTROL is a bitmap. See 4.2.2.1.2 in the UVC 1.5 Class Specification
+    // D0: Manual Mode – manual: Exposure Time, manual Iris
+    // D1: Auto Mode – auto Exposure: Time, auto Iris
+    // D2: Shutter Priority Mode: manual Exposure Time, auto Iris
+    // Windows behaves different from Linux. Windows will use D2 for Manual and Linux D0 for manual
+    if (mapping->v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+        controls->mapping[controls->size].minimum = 0;
+        controls->mapping[controls->size].maximum = 7;
+        controls->mapping[controls->size].step = 7;
+    }
 
     printf("V4L2: Mapping %s (%s = %s)\n", queryctrl.name, v4l2_control_name(mapping->v4l2),
            uvc_control_name(mapping->type, mapping->uvc));

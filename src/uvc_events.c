@@ -94,6 +94,13 @@ static void uvc_interface_control(struct processing *processing)
         break;
 
     case UVC_GET_CUR:
+        // The UVC exposure mode values do not directly map to the RaspberryPi V4L2 values. See v4l2_prepare_camera_control
+        if (mapping->v4l2 == V4L2_CID_EXPOSURE_AUTO) {
+            if (mapping->value == 0) {
+                mapping->value = 2; // Auto Mode
+            }
+        }
+
         uvc_request->response.length = 4;
         memcpy(&uvc_request->response.data[0], &mapping->value, uvc_request->response.length);
         break;
@@ -112,6 +119,9 @@ static void uvc_interface_control(struct processing *processing)
         uvc_request->response.length = 4;
         memcpy(&uvc_request->response.data[0], &mapping->step, uvc_request->response.length);
         break;
+
+    case UVC_GET_LEN:
+        printf("Warning: Handling of UVC_GET_LEN is not implemented\n");
 
     default:
         uvc_request->response.length = -EL2HLT;

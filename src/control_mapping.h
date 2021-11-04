@@ -53,7 +53,9 @@ struct control_mapping_pair control_mapping[] = {
     {
         .type = UVC_VC_PROCESSING_UNIT,
         .uvc = UVC_PU_WHITE_BALANCE_TEMPERATURE_CONTROL,
-        .v4l2 = V4L2_CID_WHITE_BALANCE_TEMPERATURE,
+        .v4l2 = V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE,
+        // Normally this would be expected to map to V4L2_CID_WHITE_BALANCE_TEMPERATURE
+        // However, RaspberryPi only exposes V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE
     },
     {
         .type = UVC_VC_PROCESSING_UNIT,
