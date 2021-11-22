@@ -12,3 +12,6 @@ uvc-gadget: uvc-gadget.o
 clean:
 	rm -f *.o
 	rm -f uvc-gadget
+	
+install: uvc-gadget
+    install -m 644 uvc-gadget /usr/bin
