@@ -17,13 +17,13 @@ mkdir $GADGET_PATH/strings/0x409
 echo 100000000d2386db > $GADGET_PATH/strings/0x409/serialnumber
 echo "Samsung" > $GADGET_PATH/strings/0x409/manufacturer
 echo "PI4 USB Device" > $GADGET_PATH/strings/0x409/product
-mkdir $GADGET_PATH/configs/c.2
-mkdir $GADGET_PATH/configs/c.2/strings/0x409
-echo 500 > $GADGET_PATH/configs/c.2/MaxPower
-echo "UVC" > $GADGET_PATH/configs/c.2/strings/0x409/configuration
+mkdir $GADGET_PATH/configs/c.1
+mkdir $GADGET_PATH/configs/c.1/strings/0x409
+echo 500 > $GADGET_PATH/configs/c.1/MaxPower
+echo "UVC" > $GADGET_PATH/configs/c.1/strings/0x409/configuration
 
 mkdir $GADGET_PATH/functions/uvc.usb0
-mkdir $GADGET_PATH/functions/acm.usb0
+#mkdir $GADGET_PATH/functions/acm.usb0
 
 # cat <<EOF $GADGET_PATH/functions/uvc.usb0/control/processing/default/bmControls
 # 0
@@ -59,17 +59,17 @@ EOF
 
 }
 
-config_frame mjpeg m 640 360
+#config_frame mjpeg m 640 360
 config_frame mjpeg m 640 480
-config_frame mjpeg m 800 600
-config_frame mjpeg m 1024 768
-config_frame mjpeg m 1280 720
-config_frame mjpeg m 1280 960
-config_frame mjpeg m 1440 1080
-config_frame mjpeg m 1536 864
-config_frame mjpeg m 1600 900
-config_frame mjpeg m 1600 1200
-config_frame mjpeg m 1920 1080
+#config_frame mjpeg m 800 600
+#config_frame mjpeg m 1024 768
+#config_frame mjpeg m 1280 720
+#config_frame mjpeg m 1280 960
+#config_frame mjpeg m 1440 1080
+#config_frame mjpeg m 1536 864
+#config_frame mjpeg m 1600 900
+#config_frame mjpeg m 1600 1200
+#config_frame mjpeg m 1920 1080
 
 
 mkdir $GADGET_PATH/functions/uvc.usb0/streaming/header/h
@@ -80,10 +80,12 @@ cd ../../class/fs
 ln -s ../../header/h
 cd ../../class/hs
 ln -s ../../header/h
+#cd ../../class/ss
+#ln -s ../../header/h
 cd ../../../../..
 
-ln -s $GADGET_PATH/functions/uvc.usb0 $GADGET_PATH/configs/c.2/uvc.usb0
-ln -s $GADGET_PATH/functions/acm.usb0 $GADGET_PATH/configs/c.2/acm.usb0
+ln -s $GADGET_PATH/functions/uvc.usb0 $GADGET_PATH/configs/c.1/uvc.usb0
+#ln -s $GADGET_PATH/functions/acm.usb0 $GADGET_PATH/configs/c.1/acm.usb0
 udevadm settle -t 5 || :
 ls /sys/class/udc > $GADGET_PATH/UDC
 
