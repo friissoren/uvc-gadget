@@ -1,5 +1,5 @@
 #!/bin/bash
-GADGET_PATH=/sys/kernel/config/usb_gadget/pi4
+GADGET_PATH=/sys/kernel/config/usb_gadget/camera
 
 mkdir $GADGET_PATH
 
@@ -59,17 +59,22 @@ EOF
 
 }
 
-config_frame mjpeg m 640 360
-config_frame mjpeg m 640 480
-config_frame mjpeg m 800 600
-config_frame mjpeg m 1024 768
+#config_frame uncompressed u 640 360
+#config_frame uncompressed u 640 480
+#config_frame uncompressed u 1280 720
+#config_frame uncompressed u 1920 1080
+
+#config_frame mjpeg m 640 360
+#config_frame mjpeg m 640 480
+#config_frame mjpeg m 800 600
+#config_frame mjpeg m 1024 768
 config_frame mjpeg m 1280 720
-config_frame mjpeg m 1280 960
-config_frame mjpeg m 1440 1080
-config_frame mjpeg m 1536 864
-config_frame mjpeg m 1600 900
-config_frame mjpeg m 1600 1200
-config_frame mjpeg m 1920 1080
+#config_frame mjpeg m 1280 960
+#config_frame mjpeg m 1440 1080
+#config_frame mjpeg m 1536 864
+#config_frame mjpeg m 1600 900
+#config_frame mjpeg m 1600 1200
+#config_frame mjpeg m 1920 1080
 
 
 mkdir $GADGET_PATH/functions/uvc.usb0/streaming/header/h
@@ -80,6 +85,8 @@ cd ../../class/fs
 ln -s ../../header/h
 cd ../../class/hs
 ln -s ../../header/h
+# cd ../../class/ss
+# ln -s ../../header/h
 cd ../../../../..
 
 ln -s $GADGET_PATH/functions/uvc.usb0 $GADGET_PATH/configs/c.1/uvc.usb0
