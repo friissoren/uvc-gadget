@@ -20,4 +20,5 @@ install: uvc-gadget
 	install -m 755 uvc-gadget ${DESTDIR}
 	install -m 755 multi-gadget.sh ${DESTDIR}
 	install -m 755 cleanup.sh ${DESTDIR}
+	install -m 755 start-gadget.sh ${DESTDIR}
 
