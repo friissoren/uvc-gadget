@@ -920,6 +920,10 @@ static void v4l2_set_ctrl(struct control_mapping_pair ctrl)
 static void v4l2_apply_camera_control(struct control_mapping_pair * mapping,
     struct v4l2_queryctrl queryctrl, struct v4l2_control control)
 {
+    // For some reason the current values are read out as bogus numbers.
+    // Initialize all values to the default.
+    control.value          = queryctrl.default_value;
+
     mapping->enabled       = true;
     mapping->control_type  = queryctrl.type;
     mapping->v4l2_minimum  = queryctrl.minimum;
