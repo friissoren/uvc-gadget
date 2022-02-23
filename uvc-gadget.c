@@ -1004,6 +1004,9 @@ static void v4l2_get_controls()
         for (i = 0; i < control_mapping_size; i++) {
             if (control_mapping[i].v4l2 == id) {
                 control.id = queryctrl.id;
+                if (control.id == (V4L2_CID_EXPOSURE_AUTO_PRIORITY | V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND)) {
+                    control.id = V4L2_CID_EXPOSURE_AUTO_PRIORITY; // This ID is only found if the next flags are cleared
+                }
                 int ret = ioctl (v4l2_dev.fd, VIDIOC_G_CTRL, &control);
                 if (0 == ret) {
                     v4l2_apply_camera_control(&control_mapping[i], queryctrl, control);
