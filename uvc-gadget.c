@@ -997,14 +997,19 @@ static void v4l2_get_controls()
         queryctrl.id |= next_fl;
 
         if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
+            printf("%s was disabled\n", queryctrl.name);
             continue;
         }
 
         for (i = 0; i < control_mapping_size; i++) {
             if (control_mapping[i].v4l2 == id) {
                 control.id = queryctrl.id;
-                if (0 == ioctl (v4l2_dev.fd, VIDIOC_G_CTRL, &control)) {
+                int ret = ioctl (v4l2_dev.fd, VIDIOC_G_CTRL, &control);
+                if (0 == ret) {
                     v4l2_apply_camera_control(&control_mapping[i], queryctrl, control);
+                }
+                else {
+                    printf("ioctrl returned %d for 0x%X\n", ret, control.id);
                 }
             }
         }
